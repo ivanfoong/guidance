@@ -86,11 +86,6 @@ class LlamaCppTokenizer(Tokenizer):
     def __init__(self, model_obj, chat_template=None):
         self._model_obj = model_obj
 
-        self._sentinel_bytes = "\x02".encode()
-        self._sentinel_tokens = self._model_obj.tokenize(
-            self._sentinel_bytes, add_bos=False, special=True
-        )
-
         tokenizer = llama_cpp.LlamaTokenizer(model_obj)
         vocab = llama_cpp.llama_model_get_vocab(model_obj.model)
         if vocab is None:
@@ -98,6 +93,11 @@ class LlamaCppTokenizer(Tokenizer):
 
         if not hasattr(tokenizer, "llama"):
             tokenizer.llama = tokenizer._model
+        
+        self._sentinel_bytes = "\x02".encode()
+        self._sentinel_tokens = self._model_obj.tokenize(
+            text=self._sentinel_bytes, add_bos=False, special=True
+        )
 
         # get the bytes strings for all the tokens
         tokens = []
